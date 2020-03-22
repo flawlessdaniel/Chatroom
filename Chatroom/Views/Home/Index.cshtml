@@ -1,0 +1,222 @@
+﻿@{
+    ViewBag.Title = "Login Page";
+}
+
+<h3>Bienvenido a Chatroom by Daniel Carbajal Fernandez</h3>
+<br />
+<br />
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-lg-6 col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h5>Login Users</h5>
+                    <div id="dvCorrectLogin" style="display: none;" class="alert alert-success">
+                        <b>Success! </b><label id="lblMessageCorrectLogin"></label>
+                    </div>
+                    <div id="dvIncorrectLogin" style="display: none;" class="alert alert-danger">
+                        <b>Error! </b><label id="lblMessageIncorrectLogin"></label>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12">
+                                <label for="txtEmailLogin">Email: </label>
+                                <input type="text" value="" id="txtEmailLogin" name="txtEmailLogin" class="form-control" placeholder="Email" />
+                            </div>
+                            <div class="col-md-12 col-lg-12">
+                                <label for="txtPasswordLogin">Password: </label>
+                                <input type="password" value="" id="txtPasswordLogin" name="txtPasswordLogin" class="form-control" placeholder="Password" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <button id="btnLogin" name="btnLogin" class="btn btn-success">Log In !</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-6 col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h5>If you are new user, Register Here !</h5>
+                    <div id="dvRegisterCorrect" style="display: none;" class="alert alert-success">
+                        <b>Success! </b><label id="lblMessageCorrectRegister"></label>
+                    </div>
+                    <div id="dvRegisterIncorrect" style="display: none;" class="alert alert-danger">
+                        <b>Error! </b><label id="lblMessageIncorrectRegister"></label>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12">
+                                <label for="txtEmail">Email: </label>
+                                <input type="text" value="" id="txtEmail" name="txtEmail" class="form-control" placeholder="Email" />
+                            </div>
+                            <div class="col-md-12 col-lg-12">
+                                <label for="txtUsername">Username: </label>
+                                <input type="text" value="" id="txtUsername" name="txtUsername" class="form-control" placeholder="Username" />
+                            </div>
+                            <div class="col-md-12 col-lg-12">
+                                <label for="txtPassword">Password: </label>
+                                <input type="password" value="" id="txtPassword" name="txtPassword" class="form-control" placeholder="Password" />
+                            </div>
+                            <div class="col-md-12 col-lg-12">
+                                <label for="txtConfirmPassword">Confirm Password: </label>
+                                <input type="password" value="" id="txtConfirmPassword" name="txtConfirmPassword" class="form-control" placeholder="Password" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <button id="btnRegister" class="btn btn-success">Register !</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#btnRegister").click(function () {
+
+                if ($("#txtEmail").val().trim() == "") {
+                    $("#lblMessageCorrectRegister").text("");
+                    $("#dvRegisterCorrect").hide();
+                    $("#lblMessageIncorrectRegister").text("You must enter an email !");
+                    $("#dvRegisterIncorrect").toggle("slow");
+                    return false;
+                }
+
+                if ($("#txtUsername").val().trim() == "") {
+                    $("#lblMessageCorrectRegister").text("");
+                    $("#dvRegisterCorrect").hide();
+                    $("#lblMessageIncorrectRegister").text("You must enter an username !");
+                    $("#dvRegisterIncorrect").toggle("slow");
+                    return false;
+                }
+
+                if ($("#txtPassword").val().trim() == "") {
+                    $("#lblMessageCorrectRegister").text("");
+                    $("#dvRegisterCorrect").hide();
+                    $("#lblMessageIncorrectRegister").text("You must enter a password !");
+                    $("#dvRegisterIncorrect").toggle("slow");
+                    return false;
+                }
+
+                if ($("#txtConfirmPassword").val().trim() == "") {
+                    $("#lblMessageCorrectRegister").text("");
+                    $("#dvRegisterCorrect").hide();
+                    $("#lblMessageIncorrectRegister").text("You must confirm your password !");
+                    $("#dvRegisterIncorrect").toggle("slow");
+                    return false;
+                }
+
+                if ($("#txtPassword").val().trim() != $("#txtConfirmPassword").val().trim()) {
+                    $("#lblMessageCorrectRegister").text("");
+                    $("#dvRegisterCorrect").hide();
+                    $("#lblMessageIncorrectRegister").text("Your password and confirm password must be the same !");
+                    $("#dvRegisterIncorrect").toggle("slow");
+                    return false;
+                }
+
+                var newUser = {
+                    "Id": 0,
+                    "Email": $("#txtEmail").val().trim(),
+                    "Passwrd": $("#txtPassword").val().trim(),
+                    "Username": $("#txtUsername").val().trim()
+                }
+
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(newUser),
+                    url: "@Url.Action("UserRegister")",
+                    dataType: "json",
+                    success: function (response) {
+                        var responseData = response;
+                        if (responseData.Code == "200") {
+                            $("#lblMessageIncorrectRegister").text("");
+                            $("#dvRegisterIncorrect").hide();
+                            $("#lblMessageCorrectRegister").text("Register Success");
+                            $("#dvRegisterCorrect").toggle("slow");
+                        } else {
+                            $("#lblMessageCorrectRegister").text("");
+                            $("#dvRegisterCorrect").hide();
+                            $("#lblMessageIncorrectRegister").text(responseData.Msg);
+                            $("#dvRegisterIncorrect").toggle("slow");
+                        }
+
+                        setTimeout(function () {
+                            $("#lblMessageCorrectRegister").text("");
+                            $("#dvRegisterCorrect").hide();
+                            $("#lblMessageIncorrectRegister").text("");
+                            $("#dvRegisterIncorrect").hide();
+                            $("#txtEmail").val("");
+                            $("#txtUsername").val("");
+                            $("#txtPassword").val("");
+                            $("#txtConfirmPassword").val("");
+                        }, 2000);
+                    },
+                    error: function (response) {
+            
+                    }
+                });
+            });
+
+            $("#btnLogin").click(function () {
+
+                if ($("#txtEmailLogin").val().trim() == "") {
+                    $("#lblMessageCorrectLogin").text("");
+                    $("#dvCorrectLogin").hide();
+                    $("#lblMessageIncorrectLogin").text("You must enter an email !");
+                    $("#dvIncorrectLogin").toggle("slow");
+                    return false;
+                }
+
+                if ($("#txtPasswordLogin").val().trim() == "") {
+                    $("#lblMessageCorrectLogin").text("");
+                    $("#dvCorrectLogin").hide();
+                    $("#lblMessageIncorrectLogin").text("You must enter an username !");
+                    $("#dvIncorrectLogin").toggle("slow");
+                    return false;
+                }
+
+                var user = {
+                    "email": $("#txtEmailLogin").val().trim(),
+                    "passwrd": $("#txtPasswordLogin").val().trim()
+                }
+
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(user),
+                    url: "@Url.Action("UserLogin")",
+                    success: function (response) {
+                        if (response.Code == 200) {
+                            window.location.href = "@Url.Action("Index", "Chat")";
+                        } else {
+                            $("#lblMessageCorrectLogin").text("");
+                            $("#dvCorrectLogin").hide();
+                            $("#lblMessageIncorrectLogin").text(response.Msg);
+                            $("#dvIncorrectLogin").toggle("slow");
+                        }
+                        
+                    },
+                    error: function (response) {
+            
+                    }
+                });
+            });
+
+        });
+        
+    </script>
+
+}

@@ -1,0 +1,100 @@
+﻿
+@{
+    /**/
+
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Chat Room</h2>
+<br />
+<br />
+<div class="row">
+    <div class="col-md-6 col-lg-6">
+        <b>Username: </b><label id="lblUsername">@ViewData["Username"]</label>
+    </div>
+    <div class="col-md-6 col-lg-6">
+        <button class="btn btn-warning pull-right" id="btnLogout"><i class="glyphicon glyphicon-log-out"></i> Log Out</button>
+    </div>
+    <div class="col-md-12 col-lg-12">
+        <div style="height: 400px; overflow-y:scroll;" class="panel panel-default">
+            <div class="panel-body">
+                <ul id="chat"></ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 col-lg-12">
+        <div class="form-group input-group">
+            <label for="txtMessage">New Message: </label>
+            <input type="text" class="form-control" maxlength="500" placeholder="Message" id="txtMessage" name="txtMessage" />
+        </div>
+        <div class="form-group">
+            <button class="btn btn-success" id="btnSend" name="btnSend">Send</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="@Url.Content("~/Scripts/jquery.signalR-2.4.1.min.js")"></script>
+    <script src="@Url.Content("~/signalr/hubs")"></script>
+    <script>
+
+    $(document).ready(function () {
+        var pipe = [];
+
+        var chat = $.connection.chatHub;
+
+        chat.client.sendChat = function (msg) {
+            pipe.push(msg);
+            $("#chat").append("<li>" + msg + "</li>");
+            if (pipe.length >= 51) {
+                pipe.pop();
+                $("#chat").find(':first-child').remove();
+            }
+        }
+
+        $.connection.hub.start().done(function () {
+            console.debug('Connected to ChatHub...');
+        });
+
+        $("#btnSend").click(function () {
+            var message = $("#txtMessage").val();
+            $("#txtMessage").val("").focus();
+
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: '{"message":"' + message + '"}',
+                url: "@Url.Action("SendMessage")",
+                dataType: "json",
+                success: function (response) {
+
+                },
+                error: function (response) {
+
+                }
+            });
+        });
+
+        $("#btnLogout").click(function () {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: '{}',
+                url: "@Url.Action("UserLogOut", "Home")",
+                dataType: "json",
+                success: function (response) {
+                    if (response.Code == 200) {
+                        window.location.href = "@Url.Action("Index", "Home")";
+                    }
+                },
+                error: function (response) {
+                }
+            });
+        });
+
+    });
+
+    </script>
+
+}
